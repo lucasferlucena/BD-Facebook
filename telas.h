@@ -109,8 +109,7 @@ void telaUserVisitado(){
             //TODO
             break;
         default:
-            if(buscarPessoas())
-                telaUserVisitado();
+
             break;
     }
 }
@@ -155,6 +154,9 @@ void telaPrincipal(){
             telaPrincipal();
             break;
         case 6:
+            if(verAmigos())
+                telaUserVisitado();
+            telaPrincipal();
             break;
         case 7:
             //amizadeVerificador();

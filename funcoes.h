@@ -593,5 +593,58 @@ void solicitarAmizade(){
     executeQuery("insert into amizade(cod_solicitador,cod_solicitado,condicao) values('"+id_usr+"','"+id_usr_vis+"','"+"0"+"')");
 }
 
+int verAmigos(){
+    executeQuery("select * from amizade where (cod_solicitado = '"+id_usr+"' or cod_solicitador = '"+id_usr+"') and condicao = '"+"1"+"'");
+    res = mysql_store_result(conn);
+    int i = 0;
+
+    while(row=mysql_fetch_row(res)){
+        if(!i)
+            cout<< "AMIZADES" << endl << endl;
+
+        string id;
+
+        if(id_usr == row[1])
+            id = row[0];
+        else
+            id = row[1];
+
+        executeQuery("select * from usuario where cod_usr = '"+id+"'");
+        res1 = mysql_store_result(conn);
+        row1 = mysql_fetch_row(res1);
+
+        cout << "--------------------------------------------------------" << endl;
+        cout << ++i <<". "<< row1[2] << " " << row1[3] << endl;
+        cout << "--------------------------------------------------------" << endl;
+    }
+
+    if(!row&&i==0){
+        cout << "Nenhum Amigo" << endl;
+        return 0;
+    }
+
+    int reg = 0;
+    cout << "Digite 0 para voltar ou algum numero para visitar um usuario correspondente: " << endl;
+    cin >> reg;
+
+    if(!reg || reg > i)
+        return 0;
+
+    executeQuery("select * from amizade where (cod_solicitado = '"+id_usr+"' or cod_solicitador = '"+id_usr+"') and condicao = '"+"1"+"'");
+    res = mysql_store_result(conn);
+    i = 0;
+
+    while(row=mysql_fetch_row(res)){
+        if(++i == reg){
+            if(id_usr == row[1])
+                id_usr_vis = row[0];
+            else
+                id_usr_vis = row[1];
+        }
+    }
+
+    return 1;
+
+}
 
 
