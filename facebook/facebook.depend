@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1539961163 source:c:\users\lucas\documents\1-ufpb\p5\bd\facebook\main.cpp
+	<iostream>
+	<windows.h>
+	<mysql.h>
+	<string>
+	"funcoes.h"
+	"telas.h"
+
+1541008896 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\funcoes.h
+	<iostream>
+	<windows.h>
+	<mysql.h>
+	<string>
+	<stdlib.h>
+	<vector>
+
+1541005195 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\telas.h
+	<iostream>
+	<windows.h>
+	<mysql.h>
+	<string>
+	<stdlib.h>
+
