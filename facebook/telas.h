@@ -10,7 +10,7 @@ void telaResposta(){
      system("cls");
     cout << "Selecione uma das opções" << endl << endl;
     if(donoConteudo(2) || donoMural(2) || donoGrupo(2))
-        cout << "1. Excluir Comentario" << endl;
+        cout << "1. Excluir Resposta" << endl;
     cout << "0. Voltar" << endl;
 
     int option;
@@ -40,7 +40,8 @@ void telaComentario(){
     system("cls");
     switch(option){
         case 1:
-            verRespostas();
+            if(verRespostas())
+                telaResposta();
             telaComentario();
             break;
         case 2:
@@ -116,7 +117,6 @@ void telaUserVisitado(){
         visibilidade = 1;
         break;
     }
-
     if(visibilidade){
         cout << "1. Ver Perfil" << endl;
         cout << "2. Publicar" << endl;
@@ -135,6 +135,7 @@ void telaUserVisitado(){
             cout << "Pedido de Amizade Solicitado" << endl;
         }
     }
+    cout << "7. Bloquear Usuario" << endl;
     cout << "0. Voltar" << endl;
     int option;
     cin >> option;
@@ -174,9 +175,12 @@ void telaUserVisitado(){
             break;
         case 6:
             desfazerAmizade();
+            telaUserVisitado();
+            break;
+        case 7:
+            bloquearUsr();
             break;
         default:
-
             break;
     }
 }
@@ -318,8 +322,11 @@ void telaGrpVisitado(){
 void telaPrincipal(){
     id_mural_vis = id_mural;
     id_usr_vis = id_usr;
+
     system("cls");
+
     nomeUsuario();
+
     cout << "Selecione uma das opções" << endl << endl;
     cout << "1. Publicar" << endl;
     cout << "2. Ver Publicacoes do Mural" << endl;
@@ -330,6 +337,7 @@ void telaPrincipal(){
     cout << "7. Editar Perfil" << endl;
     cout << "8. Solicitaçoes Recebidas" << endl;
     cout << "9. Ver Perfil" << endl;
+    cout << "10. Ver Bloqueados" << endl;
     cout << "0. Sair" << endl;
 
     int option;
@@ -375,6 +383,9 @@ void telaPrincipal(){
             break;
         case 9:
             verPerfil();
+            telaPrincipal();
+        case 10:
+            verBloqueados();
             telaPrincipal();
         default:
             break;

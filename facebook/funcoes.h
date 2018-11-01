@@ -66,8 +66,6 @@ void excluirComentarioBloq(){
 
         executeQuery("delete from comentario where cod_coment = '"+idComentarios[i]+"'");
     }
-
-
 }
 
 void excluirPostagemBloq(){
@@ -151,7 +149,7 @@ int cadastrarUsuario(){
 
         id_usr = row[0];
         id_usr_vis = id_usr;
-        id_mural = row[8];
+        id_mural = cod_wall;
         id_mural_vis = id_mural;
 
         if(!qstate)
@@ -305,6 +303,17 @@ int membroVerificador(){
 
     return atoi(row2[2]);
 }
+
+int verificarBloqueio(){
+    executeQuery("select * from bloqueio where (cod_bloqueador = '"+id_usr_vis+"' and cod_bloqueado = '"+id_usr+"') or (cod_bloqueador = '"+id_usr+"' and cod_bloqueado = '"+id_usr_vis+"')");
+    res2 = mysql_store_result(conn);
+    row2 = mysql_fetch_row(res2);
+
+    if(!row2)
+        return 0;
+
+    return 1;
+}
 /////////////////////////////
 ////////////////////// BUSCAS
 int buscarPessoas(){
@@ -316,10 +325,13 @@ int buscarPessoas(){
     int i = 0;
 
     while(row=mysql_fetch_row(res)){
-        if(!i)
-            cout<< "RESULTADOS:" << endl;
+        id_usr_vis = row[0];
+        if(!verificarBloqueio()){
+            if(!i)
+                cout<< "RESULTADOS:" << endl;
 
-        cout << ++i << ": " << row[2] << " " << row[3] << endl;
+            cout << ++i << ": " << row[2] << " " << row[3] << endl;
+        }
     }
 
     if(!row&&i==0){
@@ -340,13 +352,17 @@ int buscarPessoas(){
     i = 0;
 
     while(row=mysql_fetch_row(res)){
-        if(++i == reg){
-            id_usr_vis = row[0];
-            id_mural_vis = row[0];
+        id_usr_vis = row[0];
+        if(!verificarBloqueio()){
+            if(++i == reg){
+                id_usr_vis = row[0];
+                id_mural_vis = row[8];
+                return 1;
+            }
         }
     }
 
-    return 1;
+    return 0;
 }
 
 int buscarGrupos(){
@@ -360,7 +376,7 @@ int buscarGrupos(){
     string aux_id = id_usr_vis;
     while(row=mysql_fetch_row(res)){
         id_grp_vis = row[0];
-        if(membroVerificador() != 3){
+        if(membroVerificador() < 3){
             if(!i)
                 cout<< "RESULTADOS:" << endl;
             cout << ++i << ": " << row[1] << endl;
@@ -386,15 +402,15 @@ int buscarGrupos(){
 
     while(row=mysql_fetch_row(res)){
         id_grp_vis = row[0];
-        if(membroVerificador() != 3){
+        if(membroVerificador() < 3){
             if(++i == reg){
                 id_grp_vis = row[0];
                 id_mural_vis = row[5];
-                cout << row[1];
+                return 1;
             }
         }
     }
-    return 1;
+    return 0;
 }
 /////////////////////////
 ///////////////////////// CRIAR PUBLICAÇÕES, COMENTÁRIOS E RESPOSTAS
@@ -531,14 +547,17 @@ int verPublicacoes(){
         nome_usr_pub = row1[2];
         sobrenome_usr_pub = row1[3];
 
-        cout << "--------------------------------------------------------" << endl;
-        cout << "#Publicacao" << ++i << endl << endl;
-        cout << nome_usr_pub << " " << sobrenome_usr_pub << endl;
-        if(row[2] != "")
-            cout << row[2] << endl;
-        if(row[1] != "")
-            cout << row[1] << endl;
-        cout << "--------------------------------------------------------" << endl;
+        id_usr_vis = id;
+        if(!verificarBloqueio()){
+            cout << "--------------------------------------------------------" << endl;
+            cout << "#Publicacao" << ++i << endl << endl;
+            cout << nome_usr_pub << " " << sobrenome_usr_pub << endl;
+            if(row[2] != "")
+                cout << row[2] << endl;
+            if(row[1] != "")
+                cout << row[1] << endl;
+            cout << "--------------------------------------------------------" << endl;
+        }
     }
 
     if(!row&&i==0){
@@ -558,13 +577,16 @@ int verPublicacoes(){
     i = 0;
 
     while(row=mysql_fetch_row(res)){
-        if(++i == reg){
-            id_pub_vis = row[0];
-            cout << row[1];
+        id_usr_vis = row[4];
+        if(!verificarBloqueio()){
+            if(++i == reg){
+                id_pub_vis = row[0];
+                return 1;
+            }
         }
     }
 
-    return 1;
+    return 0;
 }
 
 int verComentarios(){
@@ -593,11 +615,14 @@ int verComentarios(){
         nome_usr_comment = row1[2];
         sobrenome_usr_comment = row1[3];
 
-        cout << "--------------------------------------------------------" << endl;
-        cout << "#Comentario" << ++i << endl << endl;
-        cout << nome_usr_comment << " " << sobrenome_usr_comment << endl;
-        cout << row[1] << endl;
-        cout << "--------------------------------------------------------" << endl;
+        id_usr_vis = id;
+        if(!verificarBloqueio()){
+            cout << "--------------------------------------------------------" << endl;
+            cout << "#Comentario" << ++i << endl << endl;
+            cout << nome_usr_comment << " " << sobrenome_usr_comment << endl;
+            cout << row[1] << endl;
+            cout << "--------------------------------------------------------" << endl;
+        }
     }
 
     if(!row&&i==0){
@@ -617,13 +642,16 @@ int verComentarios(){
     i = 0;
 
     while(row=mysql_fetch_row(res)){
-        if(++i == reg){
-            id_cmnt_vis = row[0];
-            cout << row[1];
+        id_usr_vis = row[3];
+        if(!verificarBloqueio()){
+            if(++i == reg){
+                id_cmnt_vis = row[0];
+                return 1;
+            }
         }
     }
 
-    return 1;
+    return 0;
 }
 
 int verRespostas(){
@@ -652,11 +680,14 @@ int verRespostas(){
         nome_usr_reply = row1[2];
         sobrenome_usr_reply = row1[3];
 
-        cout << "--------------------------------------------------------" << endl;
-        cout << "#Resposta" << ++i << endl << endl;
-        cout << nome_usr_reply << " " << sobrenome_usr_reply << endl;
-        cout << row[1] << endl;
-        cout << "--------------------------------------------------------" << endl;
+        id_usr_vis = id;
+        if(!verificarBloqueio()){
+            cout << "--------------------------------------------------------" << endl;
+            cout << "#Resposta" << ++i << endl << endl;
+            cout << nome_usr_reply << " " << sobrenome_usr_reply << endl;
+            cout << row[1] << endl;
+            cout << "--------------------------------------------------------" << endl;
+        }
     }
 
     if(!row&&i==0){
@@ -676,13 +707,16 @@ int verRespostas(){
     i = 0;
 
     while(row=mysql_fetch_row(res)){
-        if(++i == reg){
-            id_resp_vis = row[0];
-            cout << row[1];
+        id_usr_vis = row[3];
+        if(!verificarBloqueio()){
+            if(++i == reg){
+                id_resp_vis = row[0];
+                return 1;
+            }
         }
     }
 
-    return 1;
+    return 0;
 }
 ///////////////////////
 /////////////////////////////
@@ -861,27 +895,27 @@ int verAmigos(){
 
     executeQuery("select * from amizade where (cod_solicitado = '"+id_usr_vis+"' or cod_solicitador = '"+id_usr_vis+"') and condicao = '"+"1"+"'");
     res = mysql_store_result(conn);
+
     i = 0;
 
     while(row=mysql_fetch_row(res)){
         if(++i == reg){
             if(id_usr_vis == row[1]){
                 id_usr_vis = row[0];
-
                 executeQuery("select * from usuario where cod_usr = '"+id_usr_vis+"'");
                 res1 = mysql_store_result(conn);
                 row1=mysql_fetch_row(res1);
 
-                id_mural_vis = row[8];
+                id_mural_vis = row1[8];
+
             }
             else{
                 id_usr_vis = row[1];
-
                 executeQuery("select * from usuario where cod_usr = '"+id_usr_vis+"'");
                 res1 = mysql_store_result(conn);
                 row1=mysql_fetch_row(res1);
 
-                id_mural_vis = row[8];
+                id_mural_vis = row1[8];
             }
         }
     }
@@ -1178,6 +1212,98 @@ int bloqueadosGrupo(){
     return 1;
 }
 
+int verBloqueados(){
+    string muralvisitado = id_mural_vis;
+    id_mural_vis = id_mural;
+
+    string idusuario = id_usr;
+    string idvisitado = id_usr_vis;
+
+    executeQuery("select * from bloqueio where cod_bloqueador = '"+id_usr+"'");
+    res = mysql_store_result(conn);
+    int i = 0;
+
+    while(row=mysql_fetch_row(res)){
+        if(!i)
+            cout<< "USUARIOS BLOQUEADOS" << endl << endl;
+
+        string id = row[1];
+        executeQuery("select * from usuario where cod_usr = '"+id+"'");
+        res1 = mysql_store_result(conn);
+        row1 = mysql_fetch_row(res1);
+
+        cout << "--------------------------------------------------------" << endl;
+        cout << ++i <<". "<< row1[2] << " " << row1[3] << endl;
+        cout << "--------------------------------------------------------" << endl;
+    }
+
+    if(!row&&i==0){
+        cout << "Nenhum Usuario Bloqueado" << endl;
+        return 0;
+    }
+
+    int reg = 0;
+    cout << "Digite 0 para voltar ou algum numero para aceitar ou nao a solicitacao correspondente: " << endl;
+    cin >> reg;
+
+    if(!reg || reg > i)
+        return 0;
+
+    executeQuery("select * from bloqueio where cod_bloqueador = '"+id_usr+"'");
+    res = mysql_store_result(conn);
+    i = 0;
+
+    while(row=mysql_fetch_row(res)){
+        if(++i == reg){
+            system("cls");
+
+            string bloqueador = row[0], bloqueado = row[1];
+            int opt;
+            cout << "1. remover bloqueio         0. voltar"<< endl;
+            cin >> opt;
+
+            if(opt == 1){
+                executeQuery("delete from bloqueio where cod_bloqueador = '"+bloqueador+"' and cod_bloqueado = '"+bloqueado+"'");
+
+                executeQuery("select * from associacao where cod_usr = '"+id_usr+"' and condicao = '"+"2"+"'");
+                res = mysql_store_result(conn);
+
+                vector<string> idGrupo;
+
+                while(row = mysql_fetch_row(res))
+                    idGrupo.push_back(row[0]);
+
+                for(int i = 0; i < idGrupo.size(); i++){
+                    executeQuery("delete from associacao where cod_grp = '"+idGrupo[i]+"' and cod_usr = '"+id_usr_vis+"'");
+                }
+
+                id_mural_vis = muralvisitado;
+                id_usr = idvisitado;
+                id_usr_vis = idusuario;
+
+                executeQuery("select * from associacao where cod_usr = '"+id_usr+"' and condicao = '"+"2"+"'");
+                res = mysql_store_result(conn);
+
+                vector<string> idGrupo2;
+
+                while(row = mysql_fetch_row(res))
+                    idGrupo2.push_back(row[0]);
+
+                for(int i = 0; i < idGrupo2.size(); i++){
+                    executeQuery("delete from associacao where cod_grp = '"+idGrupo2[i]+"' and cod_usr = '"+id_usr_vis+"'");
+                }
+
+                id_usr = idusuario;
+                id_usr_vis = idvisitado;
+
+            }
+            else
+                return 0;
+        }
+    }
+
+    return 1;
+}
 
 ////////////////////////////
 //////////////////////////// VER INFORMAÇÕES GRUPO OU PESSOA
@@ -1599,10 +1725,80 @@ void excluirPostagem(){
     executeQuery("delete from postagem where cod_post = '"+id_pub_vis+"'");
 }
 
-void bloqueioGrupo(){
+void bloquearUsr(){
+    string muralvisitado = id_mural_vis;
+    id_mural_vis = id_mural;
 
+    string idusuario = id_usr;
+    string idvisitado = id_usr_vis;
+
+    excluirRespostaBloq();
+    excluirComentarioBloq();
+    excluirPostagemBloq();
+
+    executeQuery("delete from amizade where (cod_solicitador = '"+id_usr_vis+"' and cod_solicitado = '"+id_usr+"') or (cod_solicitador = '"+id_usr+"' and cod_solicitado = '"+id_usr_vis+"')");
+
+    executeQuery("select * from associacao where cod_usr = '"+id_usr+"' and condicao = '"+"2"+"'");
+    res = mysql_store_result(conn);
+
+    vector<string> idGrupo;
+
+    while(row = mysql_fetch_row(res))
+        idGrupo.push_back(row[0]);
+
+    for(int i = 0; i < idGrupo.size(); i++){
+        executeQuery("select * from grupo where cod_grp = '"+idGrupo[i]+"'");
+        res = mysql_store_result(conn);
+        row = mysql_fetch_row(res);
+
+        id_mural_vis = row[5];
+
+        excluirRespostaBloq();
+        excluirComentarioBloq();
+        excluirPostagemBloq();
+
+        executeQuery("delete from associacao where cod_grp = '"+idGrupo[i]+"' and cod_usr = '"+id_usr_vis+"'");
+        executeQuery("insert into associacao(cod_grp, cod_usr, condicao) values('"+idGrupo[i]+"', '"+id_usr_vis+"', '"+"4"+"')");
+    }
+
+    id_mural_vis = muralvisitado;
+    id_usr = idvisitado;
+    id_usr_vis = idusuario;
+
+    excluirRespostaBloq();
+    excluirComentarioBloq();
+    excluirPostagemBloq();
+
+    executeQuery("delete from amizade where (cod_solicitador = '"+id_usr_vis+"' and cod_solicitado = '"+id_usr+"') or (cod_solicitador = '"+id_usr+"' and cod_solicitado = '"+id_usr_vis+"')");
+
+    executeQuery("select * from associacao where cod_usr = '"+id_usr+"' and condicao = '"+"2"+"'");
+    res = mysql_store_result(conn);
+
+    vector<string> idGrupo2;
+
+    while(row = mysql_fetch_row(res))
+        idGrupo2.push_back(row[0]);
+
+    for(int i = 0; i < idGrupo2.size(); i++){
+        executeQuery("select * from grupo where cod_grp = '"+idGrupo2[i]+"'");
+        res = mysql_store_result(conn);
+        row = mysql_fetch_row(res);
+
+        id_mural_vis = row[5];
+
+        excluirRespostaBloq();
+        excluirComentarioBloq();
+        excluirPostagemBloq();
+
+        executeQuery("delete from associacao where cod_grp = '"+idGrupo2[i]+"' and cod_usr = '"+id_usr_vis+"'");
+        executeQuery("insert into associacao(cod_grp, cod_usr, condicao) values('"+idGrupo2[i]+"', '"+id_usr_vis+"', '"+"4"+"')");
+    }
+
+    id_usr = idusuario;
+    id_usr_vis = idvisitado;
+
+    executeQuery("insert into bloqueio(cod_bloqueador, cod_bloqueado) values('"+id_usr+"', '"+id_usr_vis+"')");
 }
-
 
 
 

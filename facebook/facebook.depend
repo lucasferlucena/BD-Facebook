@@ -7,7 +7,7 @@
 	"funcoes.h"
 	"telas.h"
 
-1541008896 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\funcoes.h
+1541050603 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\funcoes.h
 	<iostream>
 	<windows.h>
 	<mysql.h>
@@ -15,7 +15,7 @@
 	<stdlib.h>
 	<vector>
 
-1541005195 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\telas.h
+1541050478 c:\users\lucas\documents\1-ufpb\p5\bd\facebook\telas.h
 	<iostream>
 	<windows.h>
 	<mysql.h>
